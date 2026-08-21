@@ -1,12 +1,35 @@
+# Debug trace — uncomment for verbose logging when troubleshooting auth issues
 # set -x
 
 getSHA256() {
     echo -n "$1" | sha256sum | cut -d' ' -f1
 }
 
+# Cross-platform date helper: GNU date (Linux) vs BSD date (macOS)
+# Usage: date_epoch_offset <base_epoch_or_iso> <seconds_to_add>
+date_epoch_offset() {
+    local base="$1"
+    local offset="$2"
+    if date -d @0 >/dev/null 2>&1; then
+        # GNU/Linux
+        date -d "@$base + $offset seconds" +%s
+    else
+        # macOS/BSD: convert base to epoch first, then add offset
+        local epoch
+        epoch=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(date -r "$base" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo "$base")" +%s 2>/dev/null)
+        if [ -n "$epoch" ]; then
+            echo $(( epoch + offset ))
+        else
+            # fallback: treat base as epoch already
+            echo $(( base + offset ))
+        fi
+    fi
+}
+
 XClaim=$(date +%s)
 host="https://hanime.tv"
 session_file="htv.session"
+# hanime.tv signature construction (observed from their app2 API)
 XSig=$(getSHA256 "9944822${XClaim}8${XClaim}113")
 
 hanime_email=${HTV_EMAIL:-"$1"}
@@ -95,11 +118,11 @@ main() {
     echo "[*] App version: ${version}"
     current_time=$(date '+%s')
     if [[ $last_click_date ]]; then
-        predicted_time=$(date -d $last_click_date+3hours +"%s")
+        predicted_time=$(date_epoch_offset "$last_click_date" 10800)   # +3 hours
         if [[ "$current_time" > $predicted_time ]]; then
             get_coins $session_token $version $uid
         else
-            local next_time_readble=$(date -d @$predicted_time '+%F %T')
+            local next_time_readble=$(date -d @"$predicted_time" '+%F %T' 2>/dev/null || date -r "$predicted_time" '+%F %T' 2>/dev/null)
             echo "[!] You have to wait till ${next_time_readble} to collect anymore coins"
         fi
     else

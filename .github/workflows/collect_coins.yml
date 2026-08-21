@@ -14,7 +14,7 @@ jobs:
     steps:
        - uses: actions/checkout@v3
          with:
-            ref: ${{ github.ref }}
+            ref: master
        - uses: styfle/cancel-workflow-action@0.9.0
          name: "Cancelling duplicate workflow runs"
          with:
@@ -29,14 +29,3 @@ jobs:
          run: |
            chmod +x coins.sh
            ./coins.sh
-       - name: Commit session file
-         run: |
-           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-           git config --local user.name "github-actions[bot]"
-           git add .
-           git commit -m "auto: update session" -a || true
-       - name: push session
-         uses: ad-m/github-push-action@master
-         with:
-           github_token: ${{ github.token }}
-           branch: ${{ github.ref }}

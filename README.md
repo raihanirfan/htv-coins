@@ -3,14 +3,14 @@ A simple script to claim htv coin rewards remotely. Basically a bash script port
 
 ## Running locally
 ```sh
-git clone https://github.com/EverythingSuckz/htv-coins
+git clone https://github.com/raihanirfan/htv-coins
 cd htv-coins
 chmod +x coins.sh "your-hanime-email" "your-hanime-password"
 ./coins.sh
 ```
 ## Run as a cron job in workflows
 
-- [Fork](https://github.com/EverythingSuckz/htv-coins/fork) this repo
+- [Fork](https://github.com/raihanirfan/htv-coins/fork) this repo
 ![fork image](https://i.imgur.com/i3FGwOv.png)
 - Goto `Settings` of your forked repository > `Secrets` which can be found on the side bar > `Actions`> `New Repository Secrets`.
 ![settings image](https://i.imgur.com/n9XvGGv.png)
