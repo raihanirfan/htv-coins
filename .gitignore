@@ -1,0 +1,10 @@
+# Session token — do not commit
+htv.session
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*~
